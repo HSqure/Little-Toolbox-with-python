@@ -163,7 +163,7 @@ def load_anno_txt(path):
             continue
         # 剥离后缀,剥离后分为两段: 第1段为图片路径(缺个后缀), 第2段为该图片中的所有box的组
         line = annotation_line.strip('\n')
-        pic_format = line.split('.')[1][0:3] # 查找后缀名
+        pic_format = line.split('.')[1].split(' ')[0] # 查找后缀名
         line = line.split(pic_format)
 
         '''以下为对无标注box图像(用于样本均衡)的适应性判断 '''
