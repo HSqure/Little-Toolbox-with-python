@@ -2,16 +2,20 @@ import mayavi.mlab
 import torch
 import fire
 import numpy as np
+import csv
 
-BIN_PATH='data/000002.bin'
+CSV_PATH='data/car.csv'
 
-def bin_file_loader(bin_file_path):
-    pointclouddata=np.fromfile(bin_file_path,dtype=np.float32,count=-1).reshape([-1,4])
-    pointclouddata=torch.from_numpy(pointclouddata)
-    print(f'\nPoint Cloud Size: {pointclouddata.size()}')
-    print(f'Point Cloud Type: {pointclouddata.type()}\n')
+def csv_file_loader(csv_file_path):
+    with open(csv_file_path,'r') as f:
+        reader = csv.reader(f)
+        # print(type(reader))
+        csv_data=torch.tensor([[float(row[8]),
+                                float(row[9]),
+                                float(row[10]),
+                                float(row[11])] for idx, row in enumerate(reader) if not idx==0])
 
-    return pointclouddata
+    return csv_data
 
 def viz_mayavi(points,vals="reflectivity"):
     x=points[:,0]
@@ -36,10 +40,9 @@ def viz_mayavi(points,vals="reflectivity"):
 
     mayavi.mlab.show()
 
-def main(bin_file_path=BIN_PATH):
-    pointclouddata = bin_file_loader(bin_file_path=bin_file_path)
-    viz_mayavi(pointclouddata,vals="reflectivity")
+def main(csv_file_path=CSV_PATH):
+    csv_data=csv_file_loader(csv_file_path=csv_file_path)
+    viz_mayavi(csv_data,vals="d")
 
 if __name__=="__main__":
     fire.Fire()
-
