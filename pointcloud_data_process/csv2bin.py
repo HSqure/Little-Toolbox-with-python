@@ -5,6 +5,7 @@ import numpy as np
 import csv
 
 CSV_PATH='data/car.csv'
+BIN_SAVE_PATH='data/car.bin'
 
 def csv_file_loader(csv_file_path):
     with open(csv_file_path,'r') as f:
@@ -18,9 +19,9 @@ def csv_file_loader(csv_file_path):
     return csv_data
 
 
-def main(csv_file_path=CSV_PATH):
+def main(csv_file_path=CSV_PATH, bin_save_path=BIN_SAVE_PATH):
     csv_data=csv_file_loader(csv_file_path=csv_file_path)
-
+    csv_data.numpy().tofile(BIN_SAVE_PATH)
 
 if __name__=="__main__":
     fire.Fire()
