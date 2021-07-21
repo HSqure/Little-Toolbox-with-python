@@ -6,10 +6,13 @@ import csv
 from pathlib import Path
 
 SFX = 'csv'
-CSV_PATH='data/car.bin'
+CSV_PATH='data/car.csv'
 
 def get_file_name(input_file_path):
     return Path(input_file_path).stem
+
+def get_file_path(input_file_path):
+    return str(Path(input_file_path).parent)
 
 def csv_file_loader(csv_file_path):
 
@@ -27,9 +30,15 @@ def csv_file_loader(csv_file_path):
     return csv_data
 
 def main(csv_file_path):
+
+    output_prefix = (get_file_path(csv_file_path)
+                            + '/' + get_file_name(csv_file_path)
+                            + '.bin')
+
     csv_data=csv_file_loader(csv_file_path=Path(csv_file_path))
-    csv_data.numpy().tofile(get_file_name(csv_file_path)+'.bin')
-    print('--- Convertion Complete ---')
+    csv_data.numpy().tofile(output_prefix)
+    print('\n--- Convertion Complete ---\n')
+    print(f'File Location: {output_prefix}\n')
 
 if __name__=="__main__":
     fire.Fire()
