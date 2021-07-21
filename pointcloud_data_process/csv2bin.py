@@ -6,7 +6,7 @@ import csv
 from pathlib import Path
 
 SFX = 'csv'
-# CSV_PATH='data/car.bin'
+CSV_PATH='data/car.bin'
 
 def get_file_name(input_file_path):
     return Path(input_file_path).stem
