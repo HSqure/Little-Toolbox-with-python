@@ -1,36 +1,49 @@
 import os
 import numpy as np
 import fire
+import torch
+from pathlib import Path
 
-def read_pcd(filepath):
+SFX = 'pcd'
+PCD_PATH='data/vox.pcd'
+
+def get_file_name(input_file_path):
+    return Path(input_file_path).stem
+
+def get_file_path(input_file_path):
+    return str(Path(input_file_path).parent)
+
+def pcd_file_loader(pcd_file_path):
+
     lidar = []
-    with open(filepath,'r') as f:
-        line = f.readline().strip()
-        while line:
-            linestr = line.split(" ")
-            if len(linestr) == 4:
-                linestr_convert = list(map(float, linestr))
-                lidar.append(linestr_convert)
-            line = f.readline().strip()
-    return np.array(lidar)
-
-
-def convert(pcdfolder, binfolder):
-    current_path = os.getcwd()
-    ori_path = os.path.join(current_path, pcdfolder)
-    file_list = os.listdir(ori_path)
-    des_path = os.path.join(current_path, binfolder)
-    if os.path.exists(des_path):
-        pass
+    if not SFX in pcd_file_path.suffix:
+        raise Exception(f'input file must be [.pcd] file, but input file is [{csv_file_path.suffix}] file!')
     else:
-        os.makedirs(des_path)
-    for file in file_list: 
-        (filename,extension) = os.path.splitext(file)
-        velodyne_file = os.path.join(ori_path, filename) + '.pcd'
-        pl = read_pcd(velodyne_file)
-        pl = pl.reshape(-1, 4).astype(np.float32)
-        velodyne_file_new = os.path.join(des_path, filename) + '.bin'
-        pl.tofile(velodyne_file_new)
+        with open(pcd_file_path,'r') as f:
+            line = f.readline().strip()
+            while line:
+                linestr = line.split(" ")
+                if len(linestr) == 4:
+                    linestr_convert = list(map(float, linestr))
+                    lidar.append(linestr_convert)
+                line = f.readline().strip()   
+
+        pcd_data = torch.from_numpy(np.array(lidar).reshape(-1, 4).astype(np.float32))
+    
+
+    return pcd_data
+
+
+def main(pcd_file_path=PCD_PATH):
+
+    output_prefix = (get_file_path(pcd_file_path)
+            + '/' + get_file_name(pcd_file_path)
+            + '.bin')
+
+    pcd_data = pcd_file_loader(pcd_file_path=Path(pcd_file_path))
+    pcd_data.numpy().tofile(output_prefix)
+    print('\n--- Convertion Complete ---\n')
+    print(f'File Location: {output_prefix}\n')
     
 if __name__ == "__main__":
     fire.Fire()    
