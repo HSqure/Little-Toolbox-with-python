@@ -4,9 +4,6 @@ import numpy as np
 import fire
 import torch
 
-import cmath
-
-
 LIST_FILE_PATH='../label_2/0000.txt'
 OUTPUT_LIST_FILE='output.txt'
 
