@@ -7,8 +7,7 @@ import torch
 import cmath
 
 
-LIVOX_LIST_FILE_PATH='../label_2/1589168946_0.txt'
-# LIVOX_LIST_FILE_PATH_IMAGE='../source/label/image/1/1589168946_0.txt'
+LIST_FILE_PATH='../label_2/0000.txt'
 OUTPUT_LIST_FILE='output.txt'
 
 '''
@@ -49,8 +48,8 @@ def L2norm(num1, num2=None, dim=2):
 '''
 def label_list():
     output_list_file = open(OUTPUT_LIST_FILE, 'w')
-    annotation_set = open(LIVOX_LIST_FILE_PATH).read().split('\n')
-    # annotation_set_image = open(LIVOX_LIST_FILE_PATH_IMAGE).read().split('\n')
+    annotation_set = open(LIST_FILE_PATH).read().split('\n')
+
     for cnt, annotation_line in enumerate(annotation_set):
         # 判断非空        
         if not annotation_line: 
