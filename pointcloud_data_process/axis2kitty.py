@@ -53,7 +53,7 @@ def pcd_file_loader(pcd_file_path):
 def coordi_velo2cam(velodyne_axis):
     camera_axis = torch.tensor([(-velodyne_axis[1]),        # velodyne Y -> camera X 
                                 (-velodyne_axis[2] - 0.08),  # velodyne Z -> camera Y
-                                (velodyne_axis[0] + 0.27)], # velodyne X -> camera Z
+                                (velodyne_axis[0] - 0.27)], # velodyne X -> camera Z
                                 dtype=torch.float32)
     return camera_axis
 
