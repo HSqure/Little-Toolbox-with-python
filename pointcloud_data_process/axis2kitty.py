@@ -4,11 +4,13 @@ import fire
 import torch
 from pathlib import Path
 
+# 源数据文件
 ROOT_DIR = '../../source/'
+# 转换后的存放路径
 IMG_NEW='../../training/image_2/'
 LABEL_NEW='../../training/label_2/'
 VELODYNE_NEW='../../training/velodyne/'
-
+# 点云文件后缀
 SFX = 'pcd'
 
 '''
@@ -68,6 +70,7 @@ class DatasetTransTools:
         self.__label_cnt=0
         self.__velodyne_cnt=0
         self.__img_cnt=0
+        self.obj_class_name=[]
 
     '''
         坐标转换
@@ -107,6 +110,16 @@ class DatasetTransTools:
         else:
             return torch.abs(rotation_y)
 
+    '''
+        get class and count number
+        统计类别名称以及频度并以字典形式保存
+    '''
+    def class_name_analyzer(self, object_name_list):
+        category_lib={}
+        for obj_name in object_name_list:
+            # 将未出现过的类别加入字典，出现过的则统计+1
+            category_lib[obj_name]=0 if (obj_name not in category_lib) else (category_lib[obj_name]+1)
+        print(category_lib)
 
     '''
         get label
@@ -123,6 +136,7 @@ class DatasetTransTools:
 
             # 目标类型
             category = line[1]
+            self.obj_class_name.append(line[1])
 
             # 可见区域
             area = line[2].split('—')
@@ -187,7 +201,7 @@ class DatasetTransTools:
     '''
         velodyne
     '''
-    def velodyne_list(self, pcd_file_path, file_idx, output_path):
+    def pcd2bin(self, pcd_file_path, file_idx, output_path):
         output_prefix = (output_path
                         + '{:06d}'.format(file_idx)
                         + '.bin')
@@ -216,7 +230,7 @@ class DatasetTransTools:
         velodyne_file_name_list = file_name_scanner(pcd_path)
         for idx, velodyne_file_name in enumerate(velodyne_file_name_list):
             print(f'Processing {velodyne_file_name}')
-            self.velodyne_list(pcd_path + velodyne_file_name, self.__velodyne_cnt + idx, VELODYNE_NEW)
+            self.pcd2bin(pcd_path + velodyne_file_name, self.__velodyne_cnt + idx, VELODYNE_NEW)
         self.__velodyne_cnt = self.__velodyne_cnt + idx + 1
         print(f'\n--- Point Cloud Set {set_name} Convertion Complete ---\n')
         # print(f'File Location: {output_prefix}\n')
@@ -230,12 +244,14 @@ class DatasetTransTools:
         print(f'\n--- Image Set {set_name} Convertion Complete ---\n')
 
     '''
-        获取子文件夹目录名，进入后开始转换
+        获取子文件夹目录名，进入后开始转换并分析标签文件
     '''
     def trans_running(self):
         set_name_list = file_name_scanner(ROOT_DIR+'data')
         for item in set_name_list:
             self.trans(item)
+        #统计并分析所有类别
+        self.class_name_analyzer(self.obj_class_name)
         # print(f'\n ======= {file_num} Files Move Complete ! ====== \n')         
 
 
