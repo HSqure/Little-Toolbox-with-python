@@ -52,9 +52,7 @@ class CSVConverter:
         # return csv_data
 
     def convert(self, csv_file_path=CSV_PATH):
-
         self.csv_file_loader(csv_file_path=Path(csv_file_path))
-
         print('\n--- Convertion Complete ---\n')
 
 def main():
