@@ -5,8 +5,11 @@ import os
 """
 本函数用于查找目录下所有文件名
 """
-def file_name_scanner(file_dir):        
-    file_name_list=os.listdir(file_dir)
+def file_name_scanner(file_dir, in_order=True):        
+    file_name_list = os.listdir(file_dir)
+    if in_order:
+        # 排序
+        file_name_list.sort()
     return file_name_list
 
 def _main():
