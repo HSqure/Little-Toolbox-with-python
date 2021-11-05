@@ -14,9 +14,9 @@ def file_name_scanner(file_dir, in_order=True):
 
 def _main():
 
-    list_file = open('concrete_tests.txt', 'w') #生成的清单路径
+    list_file = open('name_list.txt', 'w') #生成的清单路径
 
-    FILE_DIR = 'JPEGImages' #标注文件路径
+    FILE_DIR = './' 
 
     file_list = file_name_scanner(FILE_DIR) #查找标注文件目录下的所有文件名并保存在file_list里
 
