@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os,shutil
 import numpy as np
 import fire
