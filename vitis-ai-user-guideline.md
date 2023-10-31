@@ -1,18 +1,18 @@
-# Vitis-AI 3.5
+# Vitis-AI 3.5 基础教程
 
-## 1. 安装
+# 1. 安装
 
 
-### 1.1 依赖配置
+## 1.1 依赖配置
 
-#### 1.1.1 Docker安装与配置
-##### 🟦 Step 1:
+### 1.1.1 Docker安装与配置
+#### 🟦 Step 1:
 首先检测是否有旧版本，如果有，将其清理干净，输入以下命令进行卸载：
 ```shell
 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
 ``` 
 > ⚠️注意：  运行后`apt-get`或许会提示未安装过组件。
-##### 🟦 Step 2:
+### 🟦 Step 2:
 添加`docker`官方的`GPG密钥`:
 ```shell
 sudo apt-get update
@@ -21,7 +21,7 @@ sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 sudo chmod a+r /etc/apt/keyrings/docker.gpg
 ```
-##### 🟦 Step 3:
+#### 🟦 Step 3:
 添加`docker`软件源仓库并更新：
 ```shell
 echo \
@@ -30,7 +30,7 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 ```
-##### 🟦 Step 4:
+#### 🟦 Step 4:
 配置好之后就可以安装`docker`了：
 ```shell
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -73,7 +73,7 @@ sudo docker run hello-world
 >
 >```
 
-##### 🟦 Step 5:
+#### 🟦 Step 5:
 创建`docker`用户组：
 ```shell
 sudo groupadd docker
@@ -92,7 +92,7 @@ docker run hello-world
 ```
 和之前打印显示一致的话，就代表已经设置成功了！你的当前用户以及被添加进`docker`的用户组，以后`docker`操作无需再使用`sudo`。至此，docker基本安装以及设置已经完成！
 
-##### 🟦 附录：网络环境配置
+#### 🟦 附录：网络环境配置
 > 💡  小Tips:
 > 如果有使用proxy需求，注意需要手动配置`docker`的`proxy`，将下方指令中的`你的proxy地址`和`你的proxy端口`修改成你自己的地址以及端口后执行：
 > ```shell
@@ -104,9 +104,9 @@ docker run hello-world
 >```
 
 
-#### 1.1.2 NVIDIA Docker组件安装与配置
+### 1.1.2 NVIDIA Docker组件安装与配置
 NVIDIA Docker的组件即`NVIDIA Container Toolkit packages`，为在`docker`中调度GPU提供了支持。
-##### 🟩 Step 1:
+#### 🟩 Step 1:
 输入以下命令配置官方的`GPG密钥`，并且添加系统的软件源仓库：
 ```shell
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
@@ -116,12 +116,12 @@ curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dear
   && \
     sudo apt-get update
 ```
-##### 🟩 Step 2:
+#### 🟩 Step 2:
 仓库配置好之后就可以安装`NVIDIA Container Toolkit packages`组件了：
 ```shell
 sudo apt-get install -y nvidia-container-toolkit
 ```
-##### 🟩 Step 3:
+#### 🟩 Step 3:
 安装好组件后对`docker`进行配置：
 ```shell
 sudo nvidia-ctk runtime configure --runtime=docker
@@ -130,7 +130,7 @@ sudo nvidia-ctk runtime configure --runtime=docker
 ```shell
 sudo systemctl restart docker
 ```
-##### 🟩 Step 4:
+#### 🟩 Step 4:
 对`NVIDIA docker`进行运行测试：
 ```shell
 docker run --gpus all nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu20.04 nvidia-smi
@@ -190,7 +190,7 @@ docker run --gpus all nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu20.04 nvidia-smi
 > 
 >```
 
-### 1.2 Vitis-AI Docker的本地编译与运行 
+## 1.2 Vitis-AI Docker的本地编译与运行 
 
 在一切开始之前，首先指定你的`Vitis-AI`的路径：
 ```shell
