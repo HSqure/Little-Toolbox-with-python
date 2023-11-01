@@ -190,7 +190,7 @@ docker run --gpus all nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu20.04 nvidia-smi
 > 
 >```
 
-## 1.2 Vitis-AI Docker的本地编译与运行 
+## 1.2 Vitis-AI Docker镜像安装
 
 在一切开始之前，首先指定你的`Vitis-AI`的路径：
 ```shell
@@ -198,10 +198,10 @@ export VITIS_AI_HOME=你的Vitis-AI路径
 ```
 
 ### 1.2.1 网络环境配置（可选）
-> ⚠️注意: 如果能正常使用`proxy`资源，则可跳过[网络环境配置](#121-网络环境配置可选)阶段。
+> ⚠️注意: 如果能正常使用`proxy`资源，则可跳过[网络环境配置](#121-网络环境配置可选)阶段（1.2.1）。
 
-由于docker使用默认系统配置的是`deb http://us.archive.ubuntu.com/ubuntu/ focal universe`软件源，服务器难以保证`docker`在编译安装时的速度。此时，在没有`proxy`资源帮助解决问题的情况下，可以尝试修改软件源来加快编译安装的速度。需要完成修改以下两处配置文件：
-#### 🟥 Vitis-AI的docker软件源配置文件
+由于docker使用默认系统配置的是`deb http://us.archive.ubuntu.com/ubuntu/ focal universe`软件源，服务器难以保证`docker`在编译安装时的速度。此时，在没有`proxy`资源帮助解决问题的情况下，可以尝试修改软件源来加快编译安装的速度。需要完成修改**以下两处**配置文件：
+#### 🟥 文件1：Vitis-AI的docker软件源配置文件
 在`$VITIS_AI_HOME/docker/common/install_base.sh`中，将文件的`第28行`到`第32行`：
 ```shell
 chmod 1777 /tmp \
@@ -215,7 +215,7 @@ chmod 1777 /tmp \
 RUN sed --in-place --regexp-extended "s/(\/\/)(archive\.ubuntu)/\1cn.\2/" /etc/apt/sources.list && apt-get update && apt-get install -y --no-install-recommends \
 ```
 
-#### 🟥 系统的软件源配置文件
+#### 🟥 文件2：系统的软件源配置文件
 首先将文件`/etc/apt/sources.list`进行备份：
 ```shell
 sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak 
@@ -238,5 +238,90 @@ deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe m
 # deb-src http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe multiverse
 ```
 > 💡 小Tips:
-> [此处](https://momane.com/change-ubuntu-20-04-source-to-china-mirror)有更多可供选择的源。
+> 除此之外，还有更多源可在[此处](https://momane.com/change-ubuntu-20-04-source-to-china-mirror)选择。
 
+
+
+### 1.2.2 Vitis-AI Docker安装
+在本地安装Vitis-AI docker**有两个分支选项**，预编译的版本仅支持CPU，GPU版本只能本地编译。出于速度以及质量考虑，如果设备满足要求则推荐使用GPU版本。
+
+#### 🟥 选项 1：使用预编译 Vitis-AI Docker
+
+| 软件框架     | 硬件架构 | docker所包含工具              |
+| :---------- | :----- | :-----------------------      |
+| pytorch     | cpu    | `PyTorch（仅CPU版本）`          | 
+| tensorflow2 | cpu    | `TensorFlow 2 （仅CPU版本）`    |
+| tensorflow  | cpu    | `TensorFlow 1.15 （仅CPU版本）` |
+| pytorch     | rocm   | `PyTorch`  `ROCm`             |
+| tensorflow2 | rocm   | `TensorFlow 2`  `ROCm`        |
+
+
+根据上方表格选择参数，选择自己所需的docker image从docker服务器下载安装：
+
+```shell
+docker pull xilinx/vitis-ai-软件框架-硬件架构:latest
+```
+
+**示例**:
+- **PyTorch CPU-only docker:** `docker pull xilinx/vitis-ai-pytorch-cpu:latest`
+
+
+- **PyTorch ROCm docker:** `docker pull xilinx/vitis-ai-pytorch-rocm:latest`
+
+- **TensorFlow 2 CPU docker :** `docker pull xilinx/vitis-ai-tensorflow2-cpu:latest`
+
+- **TensorFlow 2 ROCm docker:** `docker pull xilinx/vitis-ai-tensorflow2-rocm:latest`
+
+#### 🟥 选项 2：本地编译 Vitis-AI Docker
+
+| 硬件架构参数 (-t)  | 软件框架参数 (-f)      | 命令参数选择的docker所包含工具                   |
+| :--------------- | :-------------------- | :-----------------------------------------  |
+| cpu              | pytorch               | `PyTorch（仅CPU版本）`                        |
+|                  | tf2                   | `TensorFlow 2 （仅CPU版本）`                  |
+|                  | tf1                   | `TensorFlow 1.15 （仅CPU版本）`               |
+|                  |                       |                                             |
+| gpu              | pytorch               | `PyTorch`     `AI Optimizer` `CUDA-gpu`     |
+|                  | tf2                   | `TensorFlow 2` `AI Optimizer` `CUDA-gpu`    |
+|                  | tf1                   | `TensorFlow 1.15` `AI Optimizer` `CUDA-gpu` |
+|                  |                       |                                             |
+| rocm             | pytorch               | `PyTorch` `AI Optimizer` `ROCm-gpu`         |
+|                  | tf2                   | `TensorFlow 2` `AI Optimizer` `ROCm-gpu`    |
+
+进入路径`$VITIS_AI_HOME/docker`，根据上方表格选择参数，选择自己所需的docker进行编译安装：
+
+```shell
+./docker_build.sh -t 硬件架构参数 -f 软件框架参数
+```
+
+在本教程演示中，**硬件架构参数**选择`gpu`，**软件框架参数**选择`pytorch`，以此为例，指令如下所示：
+```shell
+cd $VITIS_AI_HOME/docker
+./docker_build.sh -t gpu -f pytorch
+```
+
+>✅ 安装过程完成后如果在末尾处看到类似于如下信息，则表示安装成功:
+>```shell
+>... ...
+>... ...
+>[+] Building 630.9s (10/12)                                                                                                   docker:default
+>[+] Building 1609.4s (13/13) FINISHED                                                                                         docker:default
+> => [internal] load build definition from vitis-ai-cpu.Dockerfile                                                                       0.0s
+> => => transferring dockerfile: 1.38kB                                                                                                  0.0s
+> => [internal] load .dockerignore                                                                                                       0.0s
+> => => transferring context: 2B                                                                                                         0.0s
+> => [internal] load metadata for docker.io/xilinx/vitis-ai-gpu-pytorch-base:latest                                                      0.0s
+> => [1/8] FROM docker.io/xilinx/vitis-ai-gpu-pytorch-base                                                                               0.0s
+> => [internal] load build context                                                                                                       0.0s
+> => => transferring context: 11.42kB                                                                                                    0.0s
+> => CACHED [2/8] WORKDIR /workspace                                                                                                     0.0s
+> => CACHED [3/8] ADD ./common/ .                                                                                                        0.0s
+> => CACHED [4/8] ADD ./conda /scratch                                                                                                   0.0s
+> => CACHED [5/8] ADD conda/banner.sh /etc/                                                                                              0.0s
+> => CACHED [6/8] ADD conda/gpu_conda/bashrc /etc/bash.bashrc                                                                            0.0s
+> => [7/8] RUN if [[ -n "pytorch" ]]; then  bash ./install_pytorch.sh; fi                                                             1200.3s
+> => [8/8] RUN mkdir -p /opt/vitis_ai/conda/pkgs && chmod 777 /opt/vitis_ai/conda/pkgs && ./install_vairuntime.sh && rm -fr ./*        345.7s 
+> => exporting to image                                                                                                                 63.3s 
+> => => exporting layers                                                                                                                63.3s 
+> => => writing image sha256:a49887360efe4ab69248b0474209f1b7db139e0768932801da82d336a8278e1d                                            0.0s 
+> => => naming to docker.io/xilinx/vitis-ai-pytorch-gpu:3.5.0.001-bbccde60d  
+>```
